@@ -1,12 +1,30 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { PrismaService } from './prisma.service';
+import { randomUUID } from 'crypto';
+import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
+import { CreateNotificationBody } from './create-notification-body.ts';
 
-@Controller()
+@Controller('notifications')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  list() {
+    return this.prisma.notification.findMany();
+  }
+
+  @Post()
+  async createNotification(@Body() body: CreateNotificationBody) {
+    const { content, category, recipientId } = body;
+
+    await this.prisma.notification.create({
+      data: {
+        id: randomUUID(),
+        content: content, 
+        category: category,
+        recipientId: recipientId
+      }
+    });
   }
 }
