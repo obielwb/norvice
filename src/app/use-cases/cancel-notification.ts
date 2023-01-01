@@ -1,6 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { Content } from "../entities/content";
-import { Notification } from "../entities/notification";
 import { NotificationRepository } from "../repositories/notification-repository";
 import { NotificationNotFound } from "./errors/notification-not-found";
 
@@ -21,5 +19,9 @@ export class CancelNotification {
     if(!notification) {
       throw new NotificationNotFound();
     }
+
+    notification.cancel();
+
+    await this.notificationRepository.save(notification);
   }
 }
